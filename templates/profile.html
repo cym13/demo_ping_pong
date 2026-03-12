@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>PingPong - Profile</title>
+  </head>
+
+  <body>
+    <h1>My profile</h1>
+    % if loggedin:
+    <p>Username: {{username}}</p>
+    <p>Identifier: {{uid}}</p>
+    <p>Logged in as {{"Administrator" if is_admin else "User"}}</p>
+    % else:
+    <p>Not logged in.</p>
+    % end
+  </body>
+</html>
