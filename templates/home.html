@@ -3,13 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <title>PingPong - Home</title>
+
   </head>
 
   <body>
+    % if no_params:
+    <script>
+      window.location = "{{home_url}}";
+    </script>
+    % end
     <h1>Home</h1>
     <h2>Presentation</h2>
-    <p>Welcome to Cryptown's first table tennis club! Our website is
-    currently under maintenance but more content should be available soon.</p>
+    <p>Welcome to Cryptown's first table tennis club!</p>
+    % if maintenance:
+    <p>Our website is currently under maintenance but more content should be
+    available soon.</p>
+    % end
 
     <h2>Site map</h2>
     <ul>

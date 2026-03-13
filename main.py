@@ -36,6 +36,8 @@ def decode_params(encoded_params):
         key,value = pair.split("=", 1)
         if key == "page":
             result["page"] = value
+        elif key == "maintenance":
+            result["maintenance"] = value
         elif key == "loggedin":
             result["loggedin"] = value
         elif key == "admin":
@@ -46,20 +48,20 @@ def decode_params(encoded_params):
 
 
 def encode_params(params):
-    result =  "page="      + params["page"]
-    result += "&loggedin=" + params["loggedin"]
-    result += "&admin="    + params["admin"]
-    result += "&userid="   + params["userid"]
+    result =  "page="         + params["page"]
+    if "maintenance" in params:
+        result += "&maintenance=" + params["maintenance"]
+    if "loggedin" in params:
+        result += "&loggedin="    + params["loggedin"]
+    if "admin" in params:
+        result += "&admin="       + params["admin"]
+    if "userid" in params:
+        result += "&userid="      + params["userid"]
     return urlsafe_b64encode(encrypt(result.encode("utf8"))).decode("utf8").strip("=")
 
 
 def base_page_url(page):
     return '/?params=' + encode_params({'page':page,'loggedin':'false','admin':'false','userid':'0'})
-
-#page=home&loggedin=false&admin=false&userid=0
-#page=administration&loggedin=false&admin=false&userid=0
-#page=profile&loggedin=false&admin=false&userid=0
-#page=aboutus&loggedin=false&admin=false&userid=0
 
 @route("/")
 def show_index():
@@ -72,8 +74,13 @@ def show_index():
     params = decode_params(request.query.params)
 
     if not params or "page" not in params or params["page"] == "home":
+        maintenance = True
+        if params and "maintenance" in params:
+            maintenance = params["maintenance"] == "true"
         return template(open("templates/home.html").read(),
-                        home_url=base_page_url("home"),
+                        no_params=(params is None),
+                        maintenance=maintenance,
+                        home_url=("/?params=" + encode_params({'page':'home','maintenance':'true'})),
                         profile_url=base_page_url("profile"),
                         admin_url=base_page_url("administration"),
                         aboutus_url=base_page_url("aboutus"))
@@ -98,13 +105,14 @@ def show_index():
 
     else:
         return template(open("templates/404.html").read(),
-                        home_url=base_page_url("home"))
-
-
-def main():
-    import bottle
-    bottle.run(host="127.0.0.1", port=9876)
+                        home_url=("/?params=" + encode_params({'page':'home','maintenance':'true'})))
 
 
 if __name__ == "__main__":
-    main()
+    import bottle
+    bottle.run(host="127.0.0.1", port=9876)
+
+#page=home&maintenance=true
+#page=administration&loggedin=false&admin=false&userid=0
+#page=profile&loggedin=false&admin=false&userid=0
+#page=aboutus&loggedin=false&admin=false&userid=0
